@@ -1,2 +1,3 @@
 target_sources(kxbuffer PRIVATE
-    refcount.c)
+    refcount.c
+    alloc.c)
