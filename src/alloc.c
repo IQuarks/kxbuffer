@@ -13,7 +13,7 @@ __visible bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void (*_free)(v
     return true;
 }
 
-__visible void *alloc_get_ref(ALLOC(*alloc)) {
+__visible alloc_t *alloc_get_ref(ALLOC(*alloc)) {
     if (refcount_acquire(&alloc->refcount))
         return alloc;
 

@@ -44,7 +44,7 @@ typedef struct {
 bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void (*_free)(void *));
 
 /**
- * @brief Releases a reference to the alloc_t structure.
+ * @brief Releases a reference before destroying an alloc_t structure.
  * 
  * @param alloc Pointer to the alloc_t structure.
  * @return true if the last reference was released, false otherwise.
@@ -59,4 +59,4 @@ static inline bool alloc_on_destroy(ALLOC(*alloc)) {
  * @param alloc Pointer to the alloc_t structure.
  * @return Pointer to the alloc_t structure if successful, NULL otherwise.
  */
-void *alloc_get_ref(ALLOC(*alloc));
+alloc_t *alloc_get_ref(ALLOC(*alloc));
