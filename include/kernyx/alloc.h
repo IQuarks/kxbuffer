@@ -7,9 +7,7 @@
  */
 typedef struct {
     REFCOUNT(refcount);
-
     void *(*alloc)(usize);
-    void *(*realloc)(void *, usize);
     void (*free)(void *);
 } alloc_t;
 
@@ -27,14 +25,12 @@ typedef struct {
  * 
  * @param name The name of the alloc_t variable.
  * @param _alloc Pointer to the allocation function.
- * @param _realloc Pointer to the reallocation function.
  * @param _free Pointer to the free function.
  */
-#define ALLOC_INIT(name, _alloc, _realloc, _free) ALLOC(name) = { \
+#define ALLOC_INIT(name, _alloc, _free) ALLOC(name) = { \
         REFCOUNT_INIT(1U), \
         .alloc = (_alloc), \
-        .realloc = (_realloc), \
-        .free = (_free), \
+        .free = (_free) \
     }
 
 /**
@@ -42,20 +38,20 @@ typedef struct {
  * 
  * @param alloc Pointer to the alloc_t structure to initialize.
  * @param _alloc Pointer to the allocation function.
- * @param _realloc Pointer to the reallocation function.
  * @param _free Pointer to the free function.
  * @return true if initialization is successful, false otherwise.
  */
-bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void *(*_realloc)(void *, usize), void (*_free)(void *));
+bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void (*_free)(void *));
 
 /**
- * @def alloc_on_destroy
- * @brief Releases a reference before destroying an alloc_t structure.
+ * @brief Releases a reference to the alloc_t structure.
  * 
  * @param alloc Pointer to the alloc_t structure.
  * @return true if the last reference was released, false otherwise.
  */
-#define alloc_on_destroy(alloc) refcount_release(&(alloc)->refcount)
+static inline bool alloc_on_destroy(ALLOC(*alloc)) {
+    return refcount_release(&alloc->refcount);
+}
 
 /**
  * @brief Gets a reference to the alloc_t structure.
