@@ -2,7 +2,7 @@
 #include <entry/macros.h>
 #include <kernyx/alloc.h>
 
-__visible bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void (*_free)(void *)) {
+__visible bool INIT_ALLOC(alloc_t *alloc, void *(*_alloc)(usize), void (*_free)(void *)) {
     if (!_alloc || !_free)
         return false;
 
@@ -13,7 +13,7 @@ __visible bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void (*_free)(v
     return true;
 }
 
-__visible alloc_t *alloc_get_ref(ALLOC(*alloc)) {
+__visible alloc_t *alloc_get_ref(alloc_t *alloc) {
     if (refcount_acquire(&alloc->refcount))
         return alloc;
 

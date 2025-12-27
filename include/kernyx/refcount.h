@@ -10,14 +10,6 @@ typedef struct {
 } refcount_t;
 
 /**
- * @def REFCOUNT
- * @brief Defines a reference count member within another structure.
- * 
- * @param name The name of the reference count member.
- */
-#define REFCOUNT(name) refcount_t name
-
-/**
  * @def REFCOUNT_INIT
  * @brief Statically initializes a reference count structure.
  * 
@@ -28,10 +20,10 @@ typedef struct {
 /**
  * @brief Initializes a reference count structure.
  * 
- * @param refcount Pointer to the reference count structure to initialize.
+ * @param refcount Pointer to the reference count structure.
  * @param n The initial reference count value.
  */
-void INIT_REFCOUNT(REFCOUNT(*refcount), u32 n);
+void INIT_REFCOUNT(refcount_t *refcount, u32 n);
 
 /**
  * @brief Acquires a reference by incrementing the count.
@@ -39,7 +31,7 @@ void INIT_REFCOUNT(REFCOUNT(*refcount), u32 n);
  * @param refcount Pointer to the reference count structure.
  * @return true if the reference was successfully acquired, false otherwise.
  */
-bool refcount_acquire(REFCOUNT(*refcount));
+bool refcount_acquire(refcount_t *refcount);
 
 /**
  * @brief Releases a reference by decrementing the count.
@@ -47,4 +39,4 @@ bool refcount_acquire(REFCOUNT(*refcount));
  * @param refcount Pointer to the reference count structure.
  * @return true if the last reference count was released, false otherwise.
  */
-bool refcount_release(REFCOUNT(*refcount));
+bool refcount_release(refcount_t *refcount);

@@ -6,18 +6,10 @@
  * @brief Structure representing a memory allocator with reference counting.
  */
 typedef struct {
-    REFCOUNT(refcount);
+    refcount_t refcount;
     void *(*alloc)(usize);
     void (*free)(void *);
 } alloc_t;
-
-/**
- * @def ALLOC
- * @brief Defines an alloc_t variable or member within another structure.
- * 
- * @param name The name of the alloc_t variable.
- */
-#define ALLOC(name) alloc_t name
 
 /**
  * @def ALLOC_INIT
@@ -27,7 +19,7 @@ typedef struct {
  * @param _alloc Pointer to the allocation function.
  * @param _free Pointer to the free function.
  */
-#define ALLOC_INIT(name, _alloc, _free) ALLOC(name) = { \
+#define ALLOC_INIT(name, _alloc, _free) alloc_t name = { \
         REFCOUNT_INIT(1U), \
         .alloc = (_alloc), \
         .free = (_free) \
@@ -41,7 +33,7 @@ typedef struct {
  * @param _free Pointer to the free function.
  * @return true if initialization is successful, false otherwise.
  */
-bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void (*_free)(void *));
+bool INIT_ALLOC(alloc_t *alloc, void *(*_alloc)(usize), void (*_free)(void *));
 
 /**
  * @brief Releases a reference before destroying an alloc_t structure.
@@ -49,7 +41,7 @@ bool INIT_ALLOC(ALLOC(*alloc), void *(*_alloc)(usize), void (*_free)(void *));
  * @param alloc Pointer to the alloc_t structure.
  * @return true if the last reference was released, false otherwise.
  */
-static inline bool alloc_on_destroy(ALLOC(*alloc)) {
+static inline bool alloc_on_destroy(alloc_t *alloc) {
     return refcount_release(&alloc->refcount);
 }
 
@@ -59,4 +51,4 @@ static inline bool alloc_on_destroy(ALLOC(*alloc)) {
  * @param alloc Pointer to the alloc_t structure.
  * @return Pointer to the alloc_t structure if successful, NULL otherwise.
  */
-alloc_t *alloc_get_ref(ALLOC(*alloc));
+alloc_t *alloc_get_ref(alloc_t *alloc);

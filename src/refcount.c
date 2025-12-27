@@ -1,11 +1,11 @@
 #include <kernyx/kx.h>
 #include <kernyx/refcount.h>
 
-__visible void INIT_REFCOUNT(REFCOUNT(*refcount), u32 n) {
+__visible void INIT_REFCOUNT(refcount_t *refcount, u32 n) {
     __atomic_store_n(&refcount->refs, n, __ATOMIC_RELAXED);
 }
 
-__visible bool refcount_acquire(REFCOUNT(*refcount)) {
+__visible bool refcount_acquire(refcount_t *refcount) {
     u32 old = __atomic_load_n(&refcount->refs, __ATOMIC_RELAXED);
 
     do {
@@ -16,7 +16,7 @@ __visible bool refcount_acquire(REFCOUNT(*refcount)) {
     return true;
 }
 
-__visible bool refcount_release(REFCOUNT(*refcount)) {
+__visible bool refcount_release(refcount_t *refcount) {
     u32 old = __atomic_fetch_sub(&refcount->refs, 1U, __ATOMIC_RELEASE);
 
     if (!old)
