@@ -1,54 +1,31 @@
 #pragma once
-#include "refcount.h"
+#include <entry/bool.h>
 
 /**
  * @struct alloc_t
- * @brief Structure representing a memory allocator with reference counting.
+ * @brief Structure defining custom memory allocation and deallocation functions.
  */
 typedef struct {
-    refcount_t refcount;
     void *(*alloc)(usize);
     void (*free)(void *);
 } alloc_t;
 
 /**
  * @def ALLOC_INIT
- * @brief Initializes an alloc_t variable with specified function pointers and a reference count of 1.
+ * @brief Statically initializes an alloc_t instance with specified allocation and deallocation functions.
  * 
- * @param name The name of the alloc_t variable.
- * @param _alloc Pointer to the allocation function.
- * @param _free Pointer to the free function.
+ * @param name Name of the alloc_t instance to be created.
+ * @param _alloc Pointer to the memory allocation function.
+ * @param _free Pointer to the memory deallocation function.
  */
-#define ALLOC_INIT(name, _alloc, _free) alloc_t name = { \
-        REFCOUNT_INIT(1U), \
-        .alloc = (_alloc), \
-        .free = (_free) \
-    }
+#define ALLOC_INIT(name, _alloc, _free) alloc_t name = { _alloc, _free }
 
 /**
- * @brief Initializes an alloc_t structure.
+ * @brief Validates whether the given alloc_t instance has valid allocation and deallocation functions.
  * 
- * @param alloc Pointer to the alloc_t structure to initialize.
- * @param _alloc Pointer to the allocation function.
- * @param _free Pointer to the free function.
- * @return true if initialization is successful, false otherwise.
+ * @param alloc Pointer to the alloc_t instance to be validated.
+ * @return true if both allocation and deallocation functions are non-null, false otherwise.
  */
-bool INIT_ALLOC(alloc_t *alloc, void *(*_alloc)(usize), void (*_free)(void *));
-
-/**
- * @brief Releases a reference before destroying an alloc_t structure.
- * 
- * @param alloc Pointer to the alloc_t structure.
- * @return true if the last reference was released, false otherwise.
- */
-static inline bool alloc_on_destroy(alloc_t *alloc) {
-    return refcount_release(&alloc->refcount);
+static inline bool alloc_is_valid(const alloc_t *alloc) {
+    return alloc && (alloc->alloc && alloc->free);
 }
-
-/**
- * @brief Gets a reference to the alloc_t structure.
- * 
- * @param alloc Pointer to the alloc_t structure.
- * @return Pointer to the alloc_t structure if successful, NULL otherwise.
- */
-alloc_t *alloc_get_ref(alloc_t *alloc);
